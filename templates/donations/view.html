@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}{{ donation.donor_name }} - Donation Details - LifeLine{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('browse_donations') }}">Browse Donations</a></li>
+                    <li class="breadcrumb-item active">{{ donation.donor_name }}</li>
+                </ol>
+            </nav>
+            
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h2 class="fw-bold mb-1">{{ donation.donor_name }}</h2>
+                            <p class="text-muted mb-0">{{ donation.hospital_name }}</p>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-success fs-6 px-3 py-2">{{ donation.donation_type.value.capitalize() }}</span>
+                            <span class="badge bg-{{ get_status_color(donation.status) }} fs-6 px-3 py-2 ms-2">{{ donation.status.value.capitalize() }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <div class="info-badge bg-success bg-opacity-10 text-success">
+                                <i class="fas fa-tint me-1"></i> {{ donation.donor_blood_group.value }}
+                            </div>
+                        </div>
+                        {% if donation.organ_name %}
+                        <div class="col-md-4">
+                            <div class="info-badge bg-success bg-opacity-10 text-success">
+                                <i class="fas fa-heart me-1"></i> {{ donation.organ_name.replace('_', ' ').title() }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-4">
+                            <div class="info-badge bg-secondary bg-opacity-10 text-secondary">
+                                <i class="fas fa-cubes me-1"></i> Units: {{ donation.units_available }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-badge bg-primary bg-opacity-10 text-primary">
+                                <i class="fas fa-calendar me-1"></i> Posted {{ timeago(donation.created_at) }}
+                            </div>
+                        </div>
+                        {% if donation.is_brain_dead %}
+                        <div class="col-md-4">
+                            <div class="info-badge bg-warning bg-opacity-10 text-warning">
+                                <i class="fas fa-brain me-1"></i> Brain Dead Donor
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-user me-2 text-success"></i>Donor Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4 text-muted">Name</dt>
+                                <dd class="col-sm-8 fw-semibold">{{ donation.donor_name }}</dd>
+                                <dt class="col-sm-4 text-muted">Age</dt>
+                                <dd class="col-sm-8">{{ donation.donor_age }} years</dd>
+                                <dt class="col-sm-4 text-muted">Gender</dt>
+                                <dd class="col-sm-8">{{ donation.donor_gender.capitalize() }}</dd>
+                                <dt class="col-sm-4 text-muted">Blood Group</dt>
+                                <dd class="col-sm-8 fw-semibold text-success">{{ donation.donor_blood_group.value }}</dd>
+                                {% if donation.donor_weight %}
+                                <dt class="col-sm-4 text-muted">Weight</dt>
+                                <dd class="col-sm-8">{{ donation.donor_weight }} kg</dd>
+                                {% endif %}
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-hospital me-2 text-success"></i>Hospital & Doctor</h5>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4 text-muted">Hospital</dt>
+                                <dd class="col-sm-8">{{ donation.hospital_name }}</dd>
+                                <dt class="col-sm-4 text-muted">Address</dt>
+                                <dd class="col-sm-8">{{ donation.hospital_address }}</dd>
+                                {% if donation.doctor_name %}
+                                <dt class="col-sm-4 text-muted">Doctor</dt>
+                                <dd class="col-sm-8">Dr. {{ donation.doctor_name }}</dd>
+                                {% endif %}
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if donation.cause_of_death %}
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-file-medical me-2 text-success"></i>Medical History / Cause of Death</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ donation.cause_of_death }}</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if donation.additional_notes %}
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-sticky-note me-2 text-success"></i>Additional Notes</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ donation.additional_notes }}</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if donation.available_from or donation.available_until %}
+            <div class="card shadow-sm border-0 mt-4 border-success">
+                <div class="card-header bg-success bg-opacity-10">
+                    <h5 class="mb-0 text-success"><i class="fas fa-clock me-2"></i>Availability Window</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% if donation.available_from %}
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Available From</p>
+                            <p class="fw-semibold mb-0">{{ donation.available_from.strftime('%d %b %Y at %I:%M %p') }}</p>
+                        </div>
+                        {% endif %}
+                        {% if donation.available_until %}
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Available Until</p>
+                            <p class="fw-semibold mb-0">{{ donation.available_until.strftime('%d %b %Y at %I:%M %p') }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 100px;">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-phone me-2 text-success"></i>Contact Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="contact-item mb-3">
+                        <i class="fas fa-user text-success me-2"></i>
+                        <strong>{{ donation.contact_person }}</strong>
+                    </div>
+                    <div class="contact-item mb-3">
+                        <i class="fas fa-phone text-success me-2"></i>
+                        <a href="tel:{{ donation.contact_phone }}" class="text-decoration-none">{{ donation.contact_phone }}</a>
+                    </div>
+                    {% if donation.contact_email %}
+                    <div class="contact-item mb-3">
+                        <i class="fas fa-envelope text-success me-2"></i>
+                        <a href="mailto:{{ donation.contact_email }}" class="text-decoration-none">{{ donation.contact_email }}</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if current_user.is_authenticated and current_user.id != donation.donor_id %}
+            <div class="card shadow-sm border-0 mt-3 sticky-top" style="top: 280px;">
+                <div class="card-body text-center">
+                    {% if current_user.user_type.value in ['patient', 'hospital'] %}
+                        <a href="{{ url_for('post_need') }}?match_donation={{ donation.id }}" class="btn btn-danger btn-lg w-100 fw-semibold">
+                            <i class="fas fa-user-injured me-2"></i>I Need This
+                        </a>
+                        <p class="text-muted small mt-2">Post a matching need to connect with this donor</p>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Only patients and hospitals can respond to donations.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

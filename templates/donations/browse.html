@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Donations - LifeLine{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 100px;">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filters</h5>
+                </div>
+                <div class="card-body">
+                    <form method="GET" id="filterForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Type of Donation</label>
+                            <select name="type" class="form-select" id="typeFilter">
+                                <option value="">All Types</option>
+                                {% for nt in NeedType %}
+                                <option value="{{ nt.value }}" {% if request.args.get('type') == nt.value %}selected{% endif %}>{{ nt.value.capitalize() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Blood Group</label>
+                            <select name="blood_group" class="form-select" id="bloodGroupFilter">
+                                <option value="">All Groups</option>
+                                {% for bg in BloodGroup %}
+                                <option value="{{ bg.value }}" {% if request.args.get('blood_group') == bg.value %}selected{% endif %}>{{ bg.value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">City</label>
+                            <input type="text" name="city" class="form-control" placeholder="Enter city name" value="{{ request.args.get('city', '') }}">
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success fw-semibold">Apply Filters</button>
+                            <a href="{{ url_for('browse_donations') }}" class="btn btn-outline-secondary">Clear Filters</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold">Available Donations</h2>
+                <span class="text-muted">{{ donations.total }} donations found</span>
+            </div>
+            
+            {% if donations.items %}
+                <div class="row g-3">
+                    {% for donation in donations.items %}
+                    <div class="col-md-6">
+                        <div class="donation-card h-100">
+                            <div class="donation-header">
+                                <span class="badge bg-success">{{ donation.donation_type.value.capitalize() }}</span>
+                                <span class="badge bg-secondary">{{ donation.donor_blood_group.value }}</span>
+                            </div>
+                            <div class="donation-body">
+                                <h5 class="donation-title">{{ donation.donor_name }}</h5>
+                                <p class="donation-meta"><i class="fas fa-tint text-success me-1"></i> {{ donation.donor_blood_group.value }}</p>
+                                {% if donation.organ_name %}
+                                <p class="donation-meta"><i class="fas fa-heart text-success me-1"></i> {{ donation.organ_name.replace('_', ' ').title() }}</p>
+                                {% endif %}
+                                <p class="donation-meta"><i class="fas fa-hospital me-1"></i> {{ donation.hospital_name }}</p>
+                                <p class="donation-meta"><i class="fas fa-map-marker-alt me-1"></i> {{ donation.hospital_address[:50] }}...</p>
+                                <p class="donation-meta"><i class="fas fa-clock me-1"></i> Posted {{ timeago(donation.created_at) }}</p>
+                            </div>
+                            <div class="donation-footer">
+                                <a href="{{ url_for('view_donation', id=donation.id) }}" class="btn btn-sm btn-success w-100">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if donations.pages > 1 %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if donations.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('browse_donations', page=donations.prev_num, type=request.args.get('type'), blood_group=request.args.get('blood_group'), city=request.args.get('city')) }}">Previous</a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for page_num in donations.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                            {% if page_num %}
+                                {% if page_num == donations.page %}
+                                <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('browse_donations', page=page_num, type=request.args.get('type'), blood_group=request.args.get('blood_group'), city=request.args.get('city')) }}">{{ page_num }}</a>
+                                </li>
+                                {% endif %}
+                            {% else %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if donations.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('browse_donations', page=donations.next_num, type=request.args.get('type'), blood_group=request.args.get('blood_group'), city=request.args.get('city')) }}">Next</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-hand-holding-heart fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No donations found</h4>
+                    <p class="text-muted">Try adjusting your filters or check back later.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

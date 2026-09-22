@@ -1,0 +1,428 @@
+{% extends "base.html" %}
+
+{% block title %}Respond to Match - LifeLine{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Match Header -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-gradient-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h3 class="mb-1"><i class="fas fa-handshake me-2"></i>Match Response</h3>
+                            <p class="mb-0 opacity-75">Review details and respond to this match request</p>
+                        </div>
+                        <span class="badge bg-light text-primary fw-semibold fs-6 px-3 py-2">
+                            <i class="fas fa-clock me-1"></i>Matched {{ timeago(match.matched_at) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Side-by-side Comparison Cards -->
+            <div class="row g-4 mb-4">
+                <!-- Patient Need Card -->
+                <div class="col-lg-6">
+                    <div class="card h-100 border-0 shadow-sm need-card">
+                        <div class="card-header bg-danger bg-opacity-10 border-0">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="icon-circle bg-danger bg-opacity-20 text-danger">
+                                    <i class="fas fa-user-injured"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-0 text-danger">Patient Need</h5>
+                                    <small class="text-muted">{{ match.need.patient_name }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3 p-3 bg-light rounded">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <span class="text-muted small d-block">Type</span>
+                                        <strong>{{ match.need.need_type.value.capitalize() }}</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="text-muted small d-block">Urgency</span>
+                                        <span class="badge bg-{{ get_urgency_color(match.need.urgency) }}">{{ match.need.urgency.value.capitalize() }}</span>
+                                    </div>
+                                    {% if match.need.organ_name %}
+                                    <div class="col-6">
+                                        <span class="text-muted small d-block">Organ</span>
+                                        <strong>{{ match.need.organ_name.replace('_', ' ').title() }}</strong>
+                                    </div>
+                                    {% endif %}
+                                    <div class="col-6">
+                                        <span class="text-muted small d-block">Units Needed</span>
+                                        <strong>{{ match.need.units_needed }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <span class="text-muted small d-block">Patient Blood Group</span>
+                                <span class="blood-group-badge blood-group-{{ match.need.patient_blood_group.value.replace('+', 'pos').replace('-', 'neg').lower() }} fw-bold fs-5">
+                                    {{ match.need.patient_blood_group.value }}
+                                </span>
+                            </div>
+
+                            <div class="mb-3">
+                                <span class="text-muted small d-block">Hospital</span>
+                                <strong>{{ match.need.hospital_name }}</strong>
+                            </div>
+
+                            <div class="mb-3">
+                                <span class="text-muted small d-block">Medical Condition</span>
+                                <p class="mb-0 small text-muted">{{ match.need.medical_condition[:200] }}{% if match.need.medical_condition|length > 200 %}...{% endif %}</p>
+                            </div>
+
+                            <div class="contact-preview">
+                                <span class="text-muted small d-block">Contact Person</span>
+                                <div class="d-flex align-items-center gap-2 small">
+                                    <span class="fw-semibold">{{ match.need.contact_person }}</span>
+                                    <a href="tel:{{ match.need.contact_phone }}" class="text-decoration-none text-muted">
+                                        <i class="fas fa-phone me-1"></i>{{ match.need.contact_phone }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Your Donation Card -->
+                <div class="col-lg-6">
+                    <div class="card h-100 border-0 shadow-sm donation-card">
+                        <div class="card-header bg-success bg-opacity-10 border-0">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="icon-circle bg-success bg-opacity-20 text-success">
+                                    <i class="fas fa-hand-holding-heart"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-0 text-success">Your Donation</h5>
+                                    <small class="text-muted">{{ match.donation.donor_name }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3 p-3 bg-light rounded">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <span class="text-muted small d-block">Type</span>
+                                        <strong>{{ match.donation.donation_type.value.capitalize() }}</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="text-muted small d-block">Units Available</span>
+                                        <strong>{{ match.donation.units_available }}</strong>
+                                    </div>
+                                    {% if match.donation.organ_name %}
+                                    <div class="col-6">
+                                        <span class="text-muted small d-block">Organ</span>
+                                        <strong>{{ match.donation.organ_name.replace('_', ' ').title() }}</strong>
+                                    </div>
+                                    {% endif %}
+                                    {% if match.donation.is_brain_dead %}
+                                    <div class="col-6">
+                                        <span class="badge bg-warning text-dark w-100">
+                                            <i class="fas fa-brain me-1"></i>Brain Dead Donor
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <span class="text-muted small d-block">Donor Blood Group</span>
+                                <span class="blood-group-badge blood-group-{{ match.donation.donor_blood_group.value.replace('+', 'pos').replace('-', 'neg').lower() }} fw-bold fs-5">
+                                    {{ match.donation.donor_blood_group.value }}
+                                </span>
+                            </div>
+
+                            <div class="mb-3">
+                                <span class="text-muted small d-block">Hospital</span>
+                                <strong>{{ match.donation.hospital_name }}</strong>
+                            </div>
+
+                            {% if match.donation.available_from or match.donation.available_until %}
+                            <div class="mb-3">
+                                <span class="text-muted small d-block">Availability</span>
+                                <div class="small">
+                                    {% if match.donation.available_from %}
+                                    <i class="fas fa-clock me-1 text-muted"></i>From {{ match.donation.available_from.strftime('%d %b %Y %H:%M') }}
+                                    {% endif %}
+                                    {% if match.donation.available_until %}
+                                    <i class="fas fa-clock me-1 text-muted ms-3"></i>Until {{ match.donation.available_until.strftime('%d %b %Y %H:%M') }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="contact-preview">
+                                <span class="text-muted small d-block">Contact Person</span>
+                                <div class="d-flex align-items-center gap-2 small">
+                                    <span class="fw-semibold">{{ match.donation.contact_person }}</span>
+                                    <a href="tel:{{ match.donation.contact_phone }}" class="text-decoration-none text-muted">
+                                        <i class="fas fa-phone me-1"></i>{{ match.donation.contact_phone }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compatibility Check -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-light border-0">
+                    <h5 class="mb-0"><i class="fas fa-check-circle me-2 text-success"></i>Compatibility Check</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="compatibility-item {% if match.need.need_type == match.donation.donation_type %}text-success{% else %}text-danger{% endif %}">
+                                <i class="fas {% if match.need.need_type == match.donation.donation_type %}fa-check-circle{% else %}fa-times-circle{% endif %} fa-2x mb-2"></i>
+                                <div class="fw-semibold">Type Match</div>
+                                <small class="text-muted">{{ match.need.need_type.value.capitalize() }} ↔ {{ match.donation.donation_type.value.capitalize() }}</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="compatibility-item {% if match.need.blood_group == match.donation.blood_group %}text-success{% else %}text-warning{% endif %}">
+                                <i class="fas {% if match.need.blood_group == match.donation.blood_group %}fa-check-circle{% else %}fa-info-circle{% endif %} fa-2x mb-2"></i>
+                                <div class="fw-semibold">Blood Group</div>
+                                <small class="text-muted">
+                                    {% if match.need.blood_group == match.donation.blood_group %}
+                                        Compatible ({{ match.need.blood_group.value }})
+                                    {% else %}
+                                        Check compatibility: {{ match.need.blood_group.value }} → {{ match.donation.blood_group.value }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="compatibility-item {% if match.need.units_needed <= match.donation.units_available %}text-success{% else %}text-danger{% endif %}">
+                                <i class="fas {% if match.need.units_needed <= match.donation.units_available %}fa-check-circle{% else %}fa-times-circle{% endif %} fa-2x mb-2"></i>
+                                <div class="fw-semibold">Units</div>
+                                <small class="text-muted">
+                                    Need: {{ match.need.units_needed }} | Available: {{ match.donation.units_available }}
+                                    {% if match.need.units_needed > match.donation.units_available %}
+                                        <span class="text-danger"> (Insufficient)</span>
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Response Form -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light border-0">
+                    <h5 class="mb-0"><i class="fas fa-reply me-2"></i>Your Response</h5>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST" novalidate id="responseForm">
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Choose your response</label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="response-option">
+                                        <input type="radio" class="btn-check" name="action" id="actionAccept" value="accept" {{ 'checked' if form.action.data == 'accept' else '' }} required>
+                                        <label class="btn btn-success w-100 py-4 h-100 d-flex flex-column align-items-center justify-content-center" for="actionAccept">
+                                            <i class="fas fa-check-circle fa-3x mb-2"></i>
+                                            <span class="fw-bold fs-5">Accept</span>
+                                            <small class="opacity-75">I can fulfill this need</small>
+                                        </label>
+                                        {{ form.action(class="d-none", id="actionAcceptHidden", value="accept") }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="response-option">
+                                        <input type="radio" class="btn-check" name="action" id="actionDecline" value="decline" {{ 'checked' if form.action.data == 'decline' else '' }}>
+                                        <label class="btn btn-outline-danger w-100 py-4 h-100 d-flex flex-column align-items-center justify-content-center" for="actionDecline">
+                                            <i class="fas fa-times-circle fa-3x mb-2"></i>
+                                            <span class="fw-bold fs-5">Decline</span>
+                                            <small class="opacity-75">Cannot fulfill at this time</small>
+                                        </label>
+                                        {{ form.action(class="d-none", id="actionDeclineHidden", value="decline") }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% for error in form.action.errors %}
+                                <div class="text-danger small mt-2">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.notes.label(class="form-label fw-semibold") }}
+                            {{ form.notes(class="form-control", rows="4", placeholder="Optional: Add notes for the other party (e.g., preferred timing, special instructions, questions)...") }}
+                            {% for error in form.notes.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">Your notes will be shared with the other party.</div>
+                        </div>
+
+                        <div class="d-flex gap-3 flex-wrap">
+                            <button type="submit" class="btn btn-primary btn-lg fw-semibold px-5" id="submitBtn">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Response
+                            </button>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-lg px-5">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.blood-group-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    min-width: 80px;
+    justify-content: center;
+}
+
+.blood-group-apos { background: #fee2e2; color: #dc2626; border: 2px solid #fecaca; }
+.blood-group-aneg { background: #fee2e2; color: #dc2626; border: 2px solid #fecaca; }
+.blood-group-bpos { background: #dbeafe; color: #2563eb; border: 2px solid #bfdbfe; }
+.blood-group-bneg { background: #dbeafe; color: #2563eb; border: 2px solid #bfdbfe; }
+.blood-group-abpos { background: #f3e8ff; color: #9333ea; border: 2px solid #e9d5ff; }
+.blood-group-abneg { background: #f3e8ff; color: #9333ea; border: 2px solid #e9d5ff; }
+.blood-group-opos { background: #fef3c7; color: #d97706; border: 2px solid #fde68a; }
+.blood-group-oneg { background: #fef3c7; color: #d97706; border: 2px solid #fde68a; }
+
+.compatibility-item {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    transition: all 0.2s;
+}
+
+.compatibility-item:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.response-option .btn {
+    border-radius: 16px;
+    border-width: 2px;
+    transition: all 0.2s;
+}
+
+.response-option .btn-check:checked + .btn {
+    transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.response-option .btn-success {
+    border-color: #198754;
+}
+
+.response-option .btn-check:checked + .btn-success {
+    background: #198754;
+    border-color: #198754;
+}
+
+.response-option .btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.response-option .btn-check:checked + .btn-outline-danger {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.contact-preview {
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.need-card { border-left: 4px solid #dc3545; }
+.donation-card { border-left: 4px solid #198754; }
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+}
+
+@media (max-width: 768px) {
+    .response-option .btn {
+        padding: 2rem 1rem;
+    }
+    
+    .blood-group-badge {
+        font-size: 1rem;
+        padding: 0.4rem 0.8rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sync hidden form fields with visible radio buttons
+    const acceptBtn = document.getElementById('actionAccept');
+    const declineBtn = document.getElementById('actionDecline');
+    const acceptHidden = document.getElementById('actionAcceptHidden');
+    const declineHidden = document.getElementById('actionDeclineHidden');
+    
+    if (acceptBtn && declineBtn && acceptHidden && declineHidden) {
+        acceptBtn.addEventListener('change', function() {
+            if (this.checked) {
+                acceptHidden.checked = true;
+                declineHidden.checked = false;
+            }
+        });
+        
+        declineBtn.addEventListener('change', function() {
+            if (this.checked) {
+                declineHidden.checked = true;
+                acceptHidden.checked = false;
+            }
+        });
+        
+        // Set initial state
+        if (acceptBtn.checked) acceptHidden.checked = true;
+        if (declineBtn.checked) declineHidden.checked = true;
+    }
+    
+    // Form validation feedback
+    const form = document.getElementById('responseForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const actionChecked = document.querySelector('input[name="action"]:checked');
+            if (!actionChecked) {
+                e.preventDefault();
+                alert('Please select Accept or Decline');
+                return false;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

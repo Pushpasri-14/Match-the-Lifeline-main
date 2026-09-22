@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications - LifeLine{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold"><i class="fas fa-bell me-2"></i>Notifications</h2>
+    </div>
+    
+    {% if notifications %}
+    <div class="list-group">
+        {% for notification in notifications %}
+        <div class="list-group-item list-group-item-action {% if not notification.is_read %}unread{% endif %}" data-notification-id="{{ notification.id }}">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <h5 class="mb-0 fw-bold {% if not notification.is_read %}{% endif %}">{{ notification.title }}</h5>
+                        {% if not notification.is_read %}
+                        <span class="badge bg-danger">New</span>
+                        {% endif %}
+                    </div>
+                    <p class="mb-1 text-muted">{{ notification.message }}</p>
+                    <small class="text-muted">{{ notification.created_at.strftime('%d %b %Y at %I:%M %p') }}</small>
+                </div>
+                {% if not notification.is_read %}
+                <button class="btn btn-sm btn-outline-secondary mark-read-btn" data-id="{{ notification.id }}">
+                    <i class="fas fa-check"></i>
+                </button>
+                {% endif %}
+            </div>
+            
+            {% if notification.related_type == 'match' and notification.related_id %}
+            <div class="mt-2">
+                <a href="{{ url_for('respond_match', id=notification.related_id) }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-reply me-1"></i>View Match
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No notifications yet</h4>
+        <p class="text-muted">You'll receive notifications when there are matches or updates</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.mark-read-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const notificationId = this.dataset.id;
+        const item = this.closest('.list-group-item');
+        
+        fetch(`/notification/${notificationId}/read`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                item.classList.remove('unread');
+                this.remove();
+                const badge = item.querySelector('.badge');
+                if (badge) badge.remove();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

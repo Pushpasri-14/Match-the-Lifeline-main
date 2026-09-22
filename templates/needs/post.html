@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}Post a Need - LifeLine{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Post Patient Need</h3>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST" novalidate id="needForm">
+                        {{ form.hidden_tag() }}
+                        {% if match_donation %}
+                        <input type="hidden" name="match_donation" value="{{ match_donation.id }}">
+                        {% endif %}
+                        
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <h5 class="fw-semibold mb-3 text-danger"><i class="fas fa-info-circle me-2"></i>Type of Need</h5>
+                                <div class="mb-3">
+                                    {{ form.need_type.label(class="form-label") }}
+                                    {{ form.need_type(class="form-select", id="needType") }}
+                                    {% for error in form.need_type.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6" id="organField" style="display: none;">
+                                <div class="mb-3">
+                                    {{ form.organ_name.label(class="form-label") }}
+                                    {{ form.organ_name(class="form-select", id="organName") }}
+                                    {% for error in form.organ_name.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.blood_group.label(class="form-label") }}
+                                    {{ form.blood_group(class="form-select") }}
+                                    {% for error in form.blood_group.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    {{ form.units_needed.label(class="form-label") }}
+                                    {{ form.units_needed(class="form-control", min="1") }}
+                                    {% for error in form.units_needed.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    {{ form.urgency.label(class="form-label") }}
+                                    {{ form.urgency(class="form-select") }}
+                                    {% for error in form.urgency.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        <h5 class="fw-semibold mb-3 text-danger"><i class="fas fa-user-injured me-2"></i>Patient Information</h5>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.patient_name.label(class="form-label") }}
+                                    {{ form.patient_name(class="form-control") }}
+                                    {% for error in form.patient_name.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="mb-3">
+                                    {{ form.patient_age.label(class="form-label") }}
+                                    {{ form.patient_age(class="form-control", min="0", max="120") }}
+                                    {% for error in form.patient_age.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    {{ form.patient_gender.label(class="form-label") }}
+                                    {{ form.patient_gender(class="form-select") }}
+                                    {% for error in form.patient_gender.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.patient_blood_group.label(class="form-label") }}
+                                    {{ form.patient_blood_group(class="form-select") }}
+                                    {% for error in form.patient_blood_group.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.patient_weight.label(class="form-label") }}
+                                    {{ form.patient_weight(class="form-control", step="0.1", placeholder="Weight in kg (optional)") }}
+                                    {% for error in form.patient_weight.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.medical_condition.label(class="form-label") }}
+                            {{ form.medical_condition(class="form-control", rows="4", placeholder="Describe the medical condition, diagnosis, and any relevant medical history...") }}
+                            {% for error in form.medical_condition.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <hr class="my-4">
+                        <h5 class="fw-semibold mb-3 text-danger"><i class="fas fa-hospital me-2"></i>Hospital & Doctor Details</h5>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.doctor_name.label(class="form-label") }}
+                                    {{ form.doctor_name(class="form-control", placeholder="Treating Doctor Name") }}
+                                    {% for error in form.doctor_name.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.hospital_name.label(class="form-label") }}
+                                    {{ form.hospital_name(class="form-control") }}
+                                    {% for error in form.hospital_name.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    {{ form.hospital_address.label(class="form-label") }}
+                                    {{ form.hospital_address(class="form-control", rows="2") }}
+                                    {% for error in form.hospital_address.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        <h5 class="fw-semibold mb-3 text-danger"><i class="fas fa-phone me-2"></i>Contact Information</h5>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.contact_person.label(class="form-label") }}
+                                    {{ form.contact_person(class="form-control") }}
+                                    {% for error in form.contact_person.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.contact_phone.label(class="form-label") }}
+                                    {{ form.contact_phone(class="form-control") }}
+                                    {% for error in form.contact_phone.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.contact_email.label(class="form-label") }}
+                                    {{ form.contact_email(class="form-control", placeholder="Optional") }}
+                                    {% for error in form.contact_email.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.additional_notes.label(class="form-label") }}
+                            {{ form.additional_notes(class="form-control", rows="3", placeholder="Any additional information (optional)") }}
+                            {% for error in form.additional_notes.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.required_by.label(class="form-label") }}
+                            {{ form.required_by(class="form-control", type="datetime-local") }}
+                            {% for error in form.required_by.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">Date and time by which the need must be fulfilled (optional)</div>
+                        </div>
+                        
+                        <div class="d-flex gap-3 mt-4">
+                            {{ form.submit(class="btn btn-danger btn-lg fw-semibold px-5") }}
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-lg px-5">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('needType').addEventListener('change', function() {
+    const organField = document.getElementById('organField');
+    if (this.value === 'organ') {
+        organField.style.display = 'block';
+    } else {
+        organField.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

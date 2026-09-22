@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}How It Works - LifeLine{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto text-center mb-5">
+            <h1 class="fw-bold mb-3">How LifeLine Works</h1>
+            <p class="lead text-muted">Simple steps to connect donors with patients in need</p>
+        </div>
+    </div>
+    
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="step-card text-center h-100">
+                <div class="step-number bg-danger text-white mx-auto mb-4">1</div>
+                <h4 class="fw-bold">Register Your Account</h4>
+                <p class="text-muted">Sign up as a Patient, Donor, or Hospital. Provide your details, blood group, and contact information. Hospitals need to provide license verification.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="step-card text-center h-100">
+                <div class="step-number bg-danger text-white mx-auto mb-4">2</div>
+                <h4 class="fw-bold">Post Need or Donation</h4>
+                <p class="text-muted">Patients post urgent requirements for organs, blood, plasma, serum, or platelets. Donors/hospitals post available donations including brain-dead organ donations.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="step-card text-center h-100">
+                <div class="step-number bg-danger text-white mx-auto mb-4">3</div>
+                <h4 class="fw-bold">Automatic Matching</h4>
+                <p class="text-muted">Our smart algorithm instantly finds compatible matches based on blood group, organ type, urgency, location, and medical compatibility.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="step-card text-center h-100">
+                <div class="step-number bg-success text-white mx-auto mb-4">4</div>
+                <h4 class="fw-bold">Get Notified</h4>
+                <p class="text-muted">Both parties receive instant notifications when a match is found. View detailed medical information and contact details securely.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="step-card text-center h-100">
+                <div class="step-number bg-success text-white mx-auto mb-4">5</div>
+                <h4 class="fw-bold">Respond & Coordinate</h4>
+                <p class="text-muted">Donors can accept or decline matches. Accepted matches connect both parties directly for hospital coordination and logistics.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="step-card text-center h-100">
+                <div class="step-number bg-success text-white mx-auto mb-4">6</div>
+                <h4 class="fw-bold">Save a Life</h4>
+                <p class="text-muted">Complete the donation process. Mark matches as fulfilled. Track your impact and help build a community of life-savers.</p>
+            </div>
+        </div>
+    </div>
+    
+    <hr class="my-5">
+    
+    <div class="row g-5">
+        <div class="col-lg-6">
+            <h3 class="fw-bold mb-4"><i class="fas fa-user-injured me-2 text-danger"></i>For Patients & Families</h3>
+            <div class="accordion" id="patientAccordion">
+                <div class="accordion-item border-0 shadow-sm mb-3">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#patient1">
+                            What can I post as a need?
+                        </button>
+                    </h2>
+                    <div id="patient1" class="accordion-collapse collapse show" data-bs-parent="#patientAccordion">
+                        <div class="accordion-body">
+                            You can post needs for: <strong>Organs</strong> (heart, liver, kidney, lung, pancreas, intestine, cornea, skin, bone, heart valve), <strong>Blood</strong>, <strong>Plasma</strong>, <strong>Platelets</strong>, and <strong>Serum</strong>. Include patient medical details, hospital information, urgency level, and contact information.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item border-0 shadow-sm mb-3">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#patient2">
+                            How do I know if a donor is verified?
+                        </button>
+                    </h2>
+                    <div id="patient2" class="accordion-collapse collapse" data-bs-parent="#patientAccordion">
+                        <div class="accordion-body">
+                            All hospitals are verified during registration. For organ donations, the donor must be declared brain dead by a certified medical team. You'll see hospital verification badges and doctor certification details on each donation listing.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item border-0 shadow-sm mb-3">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#patient3">
+                            What happens after a match is found?
+                        </button>
+                    </h2>
+                    <div id="patient3" class="accordion-collapse collapse" data-bs-parent="#patientAccordion">
+                        <div class="accordion-body">
+                            You'll receive a notification with the donor's contact details. You can directly coordinate with the hospital and medical team. Once the donation is completed, mark the match as fulfilled to help others.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <h3 class="fw-bold mb-4"><i class="fas fa-hand-holding-heart me-2 text-success"></i>For Donors & Hospitals</h3>
+            <div class="accordion" id="donorAccordion">
+                <div class="accordion-item border-0 shadow-sm mb-3">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#donor1">
+                            What can I donate?
+                        </button>
+                    </h2>
+                    <div id="donor1" class="accordion-collapse collapse show" data-bs-parent="#donorAccordion">
+                        <div class="accordion-body">
+                            <strong>Living donors</strong> can donate: Blood, Plasma, Platelets, Serum, Kidney (in some cases), Liver segment.<br>
+                            <strong>Deceased/Brain-dead donors</strong> (registered by hospitals): Heart, Liver, Kidneys, Lungs, Pancreas, Intestine, Corneas, Skin, Bone, Heart Valves.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item border-0 shadow-sm mb-3">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#donor2">
+                            How does organ donation from brain-dead patients work?
+                        </button>
+                    </h2>
+                    <div id="donor2" class="accordion-collapse collapse" data-bs-parent="#donorAccordion">
+                        <div class="accordion-body">
+                            When a patient is declared brain dead by a certified medical team, the hospital can register the available organs on LifeLine. The system automatically matches with waiting patients. The hospital coordinates the retrieval and transplant process. This is a critical, time-sensitive process - organs must be retrieved within hours.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item border-0 shadow-sm mb-3">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#donor3">
+                            Can I choose who receives my donation?
+                        </button>
+                    </h2>
+                    <div id="donor3" class="accordion-collapse collapse" data-bs-parent="#donorAccordion">
+                        <div class="accordion-body">
+                            The system matches based on medical compatibility (blood group, organ type, urgency, location). When a match is found, you can review the patient's details and choose to accept or decline. You cannot directly select a specific patient, but you can respond to each match request.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm bg-gradient-danger text-white">
+                <div class="card-body p-5 text-center">
+                    <h3 class="fw-bold mb-3">Ready to Make a Difference?</h3>
+                    <p class="lead mb-4 opacity-75">Join thousands of life-savers on India's most trusted donation network</p>
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg fw-semibold px-5">
+                            <i class="fas fa-user-plus me-2"></i>Register Now
+                        </a>
+                        <a href="{{ url_for('browse_needs') }}" class="btn btn-outline-light btn-lg fw-semibold px-5">
+                            <i class="fas fa-search me-2"></i>Browse Needs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

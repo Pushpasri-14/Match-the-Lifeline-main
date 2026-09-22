@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - LifeLine{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body text-center p-4">
+                    <div class="avatar-circle bg-danger text-white mx-auto mb-3" style="width: 100px; height: 100px; font-size: 3rem;">
+                        {{ current_user.full_name[0].upper() }}
+                    </div>
+                    <h4 class="fw-bold">{{ current_user.full_name }}</h4>
+                    <span class="badge bg-{{ 'danger' if current_user.user_type.value == 'patient' else 'success' if current_user.user_type.value == 'donor' else 'primary' }} fs-6 px-3 py-2">
+                        {{ current_user.user_type.value.capitalize() }}
+                    </span>
+                    {% if current_user.blood_group %}
+                    <div class="mt-2">
+                        <span class="badge bg-secondary fs-6 px-3 py-2">
+                            <i class="fas fa-tint me-1"></i>{{ current_user.blood_group.value }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% if current_user.hospital_name %}
+                    <div class="mt-2 text-muted small">{{ current_user.hospital_name }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% if current_user.user_type.value in ['patient', 'hospital'] %}
+                    <a href="{{ url_for('post_need') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-plus-circle me-2 text-danger"></i>Post a Need
+                    </a>
+                    {% endif %}
+                    {% if current_user.user_type.value in ['donor', 'hospital'] %}
+                    <a href="{{ url_for('post_donation') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-plus-circle me-2 text-success"></i>Post Donation
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('notifications') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-bell me-2"></i>Notifications
+                        {% set unread = current_user.notifications.filter_by(is_read=False).count() %}
+                        {% if unread > 0 %}<span class="badge bg-danger ms-2">{{ unread }}</span>{% endif %}
+                    </a>
+                    <a href="{{ url_for('change_password') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-key me-2"></i>Change Password
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-user-edit me-2"></i>Edit Profile</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.full_name.label(class="form-label") }}
+                                    {{ form.full_name(class="form-control") }}
+                                    {% for error in form.full_name.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.phone.label(class="form-label") }}
+                                    {{ form.phone(class="form-control") }}
+                                    {% for error in form.phone.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.blood_group.label(class="form-label") }}
+                                    {{ form.blood_group(class="form-select") }}
+                                    {% for error in form.blood_group.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.address.label(class="form-label") }}
+                            {{ form.address(class="form-control", rows="2") }}
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    {{ form.city.label(class="form-label") }}
+                                    {{ form.city(class="form-control") }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    {{ form.state.label(class="form-label") }}
+                                    {{ form.state(class="form-control") }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    {{ form.pincode.label(class="form-label") }}
+                                    {{ form.pincode(class="form-control") }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if current_user.user_type.value == 'hospital' %}
+                        <hr class="my-4">
+                        <h6 class="fw-semibold mb-3">Hospital Details</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.hospital_name.label(class="form-label") }}
+                                    {{ form.hospital_name(class="form-control") }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.hospital_license.label(class="form-label") }}
+                                    {{ form.hospital_license(class="form-control") }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-danger fw-semibold") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

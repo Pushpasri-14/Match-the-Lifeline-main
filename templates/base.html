@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LifeLine - Organ & Blood Donation Network{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-danger" href="{{ url_for('index') }}">
+                <i class="fas fa-heartbeat me-2"></i>LifeLine
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home me-1"></i>Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('browse_needs') }}"><i class="fas fa-search me-1"></i>Find Needs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('browse_donations') }}"><i class="fas fa-hand-holding-heart me-1"></i>Find Donations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('how_it_works') }}"><i class="fas fa-question-circle me-1"></i>How It Works</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('about') }}"><i class="fas fa-info-circle me-1"></i>About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('contact') }}"><i class="fas fa-envelope me-1"></i>Contact</a>
+                    </li>
+                </ul>
+                <div class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <div class="avatar-sm me-2">
+                                    <div class="avatar-circle bg-danger text-white">
+                                        {{ current_user.full_name[0].upper() }}
+                                    </div>
+                                </div>
+                                <span class="d-none d-md-inline">{{ current_user.full_name }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><h6 class="dropdown-header">{{ current_user.full_name }}</h6></li>
+                                <li><small class="dropdown-item-text text-muted">{{ current_user.user_type.value.capitalize() }}</small></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                                {% if current_user.user_type.value in ['patient', 'hospital'] %}
+                                <li><a class="dropdown-item" href="{{ url_for('post_need') }}"><i class="fas fa-plus-circle me-2 text-danger"></i>Post Need</a></li>
+                                {% endif %}
+                                {% if current_user.user_type.value in ['donor', 'hospital'] %}
+                                <li><a class="dropdown-item" href="{{ url_for('post_donation') }}"><i class="fas fa-plus-circle me-2 text-success"></i>Post Donation</a></li>
+                                {% endif %}
+                                <li><a class="dropdown-item" href="{{ url_for('notifications') }}"><i class="fas fa-bell me-2"></i>Notifications {% set unread = current_user.notifications.filter_by(is_read=False).count() %}{% if unread > 0 %}<span class="badge bg-danger ms-2">{{ unread }}</span>{% endif %}</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <a class="btn btn-outline-danger me-2" href="{{ url_for('login') }}">Login</a>
+                        <a class="btn btn-danger" href="{{ url_for('register') }}">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="toast show align-items-center text-white bg-{{ 'danger' if category == 'danger' else 'success' if category == 'success' else 'warning' if category == 'warning' else 'info' }}" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">{{ message }}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="min-vh-100">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-dark text-white py-5 mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><i class="fas fa-heartbeat me-2 text-danger"></i>LifeLine</h5>
+                    <p class="text-muted">Connecting lives through organ and blood donation. Every donation saves a life.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('browse_needs') }}" class="text-muted text-decoration-none">Find Needs</a></li>
+                        <li><a href="{{ url_for('browse_donations') }}" class="text-muted text-decoration-none">Find Donations</a></li>
+                        <li><a href="{{ url_for('how_it_works') }}" class="text-muted text-decoration-none">How It Works</a></li>
+                        <li><a href="{{ url_for('about') }}" class="text-muted text-decoration-none">About Us</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="text-muted text-decoration-none">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Emergency Contacts</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-phone me-2"></i>National Organ Donation Helpline: 1800-11-4770</li>
+                        <li><i class="fas fa-phone me-2"></i>Blood Bank Emergency: 104</li>
+                        <li><i class="fas fa-envelope me-2"></i>support@lifeline.org</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="text-center text-muted">
+                <p class="mb-0">&copy; 2024 LifeLine. All rights reserved. | Saving lives, one donation at a time.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Register - LifeLine{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="avatar-circle bg-danger text-white mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <h2 class="fw-bold">Join LifeLine</h2>
+                        <p class="text-muted">Register to post needs, offer donations, and save lives</p>
+                    </div>
+                    
+                    <form method="POST" novalidate id="registerForm">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Register As <span class="text-danger">*</span></label>
+                            {{ form.user_type(class="form-select", id="userType") }}
+                            {% for error in form.user_type.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.full_name.label(class="form-label") }}
+                                    {{ form.full_name(class="form-control", placeholder="Full Name") }}
+                                    {% for error in form.full_name.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.email.label(class="form-label") }}
+                                    {{ form.email(class="form-control", placeholder="Email Address") }}
+                                    {% for error in form.email.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.phone.label(class="form-label") }}
+                                    {{ form.phone(class="form-control", placeholder="Phone Number") }}
+                                    {% for error in form.phone.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.blood_group.label(class="form-label") }}
+                                    {{ form.blood_group(class="form-select", id="bloodGroup") }}
+                                    {% for error in form.blood_group.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.password.label(class="form-label") }}
+                                    {{ form.password(class="form-control", placeholder="Password (min 8 chars)") }}
+                                    {% for error in form.password.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.confirm_password.label(class="form-label") }}
+                                    {{ form.confirm_password(class="form-control", placeholder="Confirm Password") }}
+                                    {% for error in form.confirm_password.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="addressFields" class="mb-3">
+                            <h6 class="fw-semibold mb-3">Address Details</h6>
+                            <div class="mb-3">
+                                {{ form.address.label(class="form-label") }}
+                                {{ form.address(class="form-control", rows="2", placeholder="Full Address") }}
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        {{ form.city.label(class="form-label") }}
+                                        {{ form.city(class="form-control", placeholder="City") }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        {{ form.state.label(class="form-label") }}
+                                        {{ form.state(class="form-control", placeholder="State") }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        {{ form.pincode.label(class="form-label") }}
+                                        {{ form.pincode(class="form-control", placeholder="Pincode") }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="hospitalFields" class="mb-3 d-none">
+                            <h6 class="fw-semibold mb-3">Hospital Details</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.hospital_name.label(class="form-label") }}
+                                        {{ form.hospital_name(class="form-control", placeholder="Hospital Name") }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.hospital_license.label(class="form-label") }}
+                                        {{ form.hospital_license(class="form-control", placeholder="License Number") }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-danger btn-lg fw-semibold") }}
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-0">Already have an account? <a href="{{ url_for('login') }}" class="fw-semibold text-decoration-none">Login</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('userType').addEventListener('change', function() {
+    const type = this.value;
+    const hospitalFields = document.getElementById('hospitalFields');
+    const addressFields = document.getElementById('addressFields');
+    
+    if (type === 'hospital') {
+        hospitalFields.classList.remove('d-none');
+        addressFields.classList.remove('d-none');
+    } else {
+        hospitalFields.classList.add('d-none');
+        addressFields.classList.remove('d-none');
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Dashboard - LifeLine{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Patient Dashboard</h2>
+        <a href="{{ url_for('post_need') }}" class="btn btn-danger">
+            <i class="fas fa-plus me-2"></i>Post New Need
+        </a>
+    </div>
+    
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-danger bg-opacity-10 text-danger">
+                    <i class="fas fa-user-injured"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number">{{ needs|length }}</div>
+                    <div class="stat-label">Total Needs Posted</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number">{{ needs|selectattr('status', 'equalto', 'active')|list|length }}</div>
+                    <div class="stat-label">Active Needs</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-info bg-opacity-10 text-info">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number">{{ matches|selectattr('status', 'equalto', 'pending')|list|length }}</div>
+                    <div class="stat-label">Pending Matches</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-success bg-opacity-10 text-success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number">{{ matches|selectattr('status', 'equalto', 'completed')|list|length }}</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list me-2 text-danger"></i>My Needs</h5>
+                    {% if needs|length > 0 %}
+                    <span class="badge bg-danger">{{ needs|length }}</span>
+                    {% endif %}
+                </div>
+                <div class="card-body p-0">
+                    {% if needs %}
+                    <div class="list-group list-group-flush">
+                        {% for need in needs %}
+                        <a href="{{ url_for('view_need', id=need.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ need.patient_name }} - {{ need.need_type.value.capitalize() }}</h6>
+                                    <small class="text-muted">{{ need.hospital_name }} • {{ need.created_at.strftime('%d %b %Y') }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-{{ get_urgency_color(need.urgency) }}">{{ need.urgency.value.capitalize() }}</span>
+                                    <span class="badge bg-{{ get_status_color(need.status) }} ms-1">{{ need.status.value.capitalize() }}</span>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-plus-circle fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No needs posted yet</h5>
+                        <a href="{{ url_for('post_need') }}" class="btn btn-danger mt-2">Post Your First Need</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-handshake me-2 text-primary"></i>My Matches</h5>
+                    {% if matches|length > 0 %}
+                    <span class="badge bg-primary">{{ matches|length }}</span>
+                    {% endif %}
+                </div>
+                <div class="card-body p-0">
+                    {% if matches %}
+                    <div class="list-group list-group-flush">
+                        {% for match in matches %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">{{ match.need.patient_name }} - {{ match.need.need_type.value.capitalize() }}</h6>
+                                    <small class="text-muted">Donor: {{ match.donation.donor_name }} • {{ match.matched_at.strftime('%d %b %Y') }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-{{ 'warning' if match.status == 'pending' else 'success' if match.status == 'accepted' else 'danger' if match.status == 'declined' else 'primary' }}">
+                                        {{ match.status.capitalize() }}
+                                    </span>
+                                    {% if match.status == 'pending' and match.donor_id == current_user.id %}
+                                    <a href="{{ url_for('respond_match', id=match.id) }}" class="btn btn-sm btn-outline-primary ms-2">Respond</a>
+                                    {% elif match.status == 'accepted' and match.patient_id == current_user.id %}
+                                    <form method="POST" action="{{ url_for('complete_match', id=match.id) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Mark this match as completed?')">Complete</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-handshake fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No matches yet</h5>
+                        <p class="text-muted">Matches will appear here when donors respond to your needs</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

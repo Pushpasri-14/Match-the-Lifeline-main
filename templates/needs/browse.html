@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Needs - LifeLine{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 100px;">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filters</h5>
+                </div>
+                <div class="card-body">
+                    <form method="GET" id="filterForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Type of Need</label>
+                            <select name="type" class="form-select" id="typeFilter">
+                                <option value="">All Types</option>
+                                {% for nt in NeedType %}
+                                <option value="{{ nt.value }}" {% if request.args.get('type') == nt.value %}selected{% endif %}>{{ nt.value.capitalize() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Urgency Level</label>
+                            <select name="urgency" class="form-select" id="urgencyFilter">
+                                <option value="">All Levels</option>
+                                {% for ul in UrgencyLevel %}
+                                <option value="{{ ul.value }}" {% if request.args.get('urgency') == ul.value %}selected{% endif %}>{{ ul.value.capitalize() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Blood Group</label>
+                            <select name="blood_group" class="form-select" id="bloodGroupFilter">
+                                <option value="">All Groups</option>
+                                {% for bg in BloodGroup %}
+                                <option value="{{ bg.value }}" {% if request.args.get('blood_group') == bg.value %}selected{% endif %}>{{ bg.value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">City</label>
+                            <input type="text" name="city" class="form-control" placeholder="Enter city name" value="{{ request.args.get('city', '') }}">
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger fw-semibold">Apply Filters</button>
+                            <a href="{{ url_for('browse_needs') }}" class="btn btn-outline-secondary">Clear Filters</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold">Patient Needs</h2>
+                <span class="text-muted">{{ needs.total }} needs found</span>
+            </div>
+            
+            {% if needs.items %}
+                <div class="row g-3">
+                    {% for need in needs.items %}
+                    <div class="col-md-6">
+                        <div class="need-card h-100">
+                            <div class="need-header">
+                                <span class="badge bg-{{ get_urgency_color(need.urgency) }}">{{ need.urgency.value.capitalize() }}</span>
+                                <span class="badge bg-secondary">{{ need.need_type.value.capitalize() }}</span>
+                            </div>
+                            <div class="need-body">
+                                <h5 class="need-title">{{ need.patient_name }}</h5>
+                                <p class="need-meta"><i class="fas fa-tint text-danger me-1"></i> {{ need.patient_blood_group.value }}</p>
+                                {% if need.organ_name %}
+                                <p class="need-meta"><i class="fas fa-heart text-danger me-1"></i> {{ need.organ_name.replace('_', ' ').title() }}</p>
+                                {% endif %}
+                                <p class="need-meta"><i class="fas fa-hospital me-1"></i> {{ need.hospital_name }}</p>
+                                <p class="need-meta"><i class="fas fa-map-marker-alt me-1"></i> {{ need.hospital_address[:50] }}...</p>
+                                <p class="need-meta"><i class="fas fa-clock me-1"></i> Posted {{ timeago(need.created_at) }}</p>
+                            </div>
+                            <div class="need-footer">
+                                <a href="{{ url_for('view_need', id=need.id) }}" class="btn btn-sm btn-danger w-100">View & Respond</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if needs.pages > 1 %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if needs.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('browse_needs', page=needs.prev_num, type=request.args.get('type'), urgency=request.args.get('urgency'), blood_group=request.args.get('blood_group'), city=request.args.get('city')) }}">Previous</a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for page_num in needs.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                            {% if page_num %}
+                                {% if page_num == needs.page %}
+                                <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('browse_needs', page=page_num, type=request.args.get('type'), urgency=request.args.get('urgency'), blood_group=request.args.get('blood_group'), city=request.args.get('city')) }}">{{ page_num }}</a>
+                                </li>
+                                {% endif %}
+                            {% else %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if needs.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('browse_needs', page=needs.next_num, type=request.args.get('type'), urgency=request.args.get('urgency'), blood_group=request.args.get('blood_group'), city=request.args.get('city')) }}">Next</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No needs found</h4>
+                    <p class="text-muted">Try adjusting your filters or check back later.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
